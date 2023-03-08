@@ -49,11 +49,11 @@ def rename(input_file):
         print("Barcode data:", barcode.data.decode("utf-8"))
         print("Barcode type:", barcode.type)
 
-    new_file_path = os.path.join(os.path.expanduser(pdf_dir), bar)
-    os.rename(input_file, new_file_path)
+        new_file_path = os.path.join(os.path.expanduser(pdf_dir), bar)
+        os.rename(input_file, new_file_path)
 
-    os.remove(image_path)
-    os.remove(output_file)
+        os.remove(image_path)
+        os.remove(output_file)
 
 
 pdf_dir = os.environ.get('PDF_DIR')
