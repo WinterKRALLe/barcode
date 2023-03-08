@@ -1,14 +1,6 @@
-'''
-
-requirements: 
-python3 -m pip install pyzbar
-python3 -m pip install pdf2img
-python3 -m pip install PyPDF3
-python3 -m pip install opencv-python
-
-'''
 import cv2
 import os
+import argparse
 from pyzbar.pyzbar import decode
 from pdf2image import convert_from_path
 from PyPDF3 import PdfFileWriter, PdfFileReader
@@ -82,13 +74,16 @@ def rename(input_file):
     os.remove(image_path)
     os.remove(output_file)
 
-'''
-ZDE SE MUSÍ UPRAVIT CESTA KE SLOŽCE S PDF SOUBORY
-'''
-pdf_dir = "/home/winter/Documents"
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--pdf_dir', type=str, required=True,
+                        help='Directory path containing PDF files.')
+    args = parser.parse_args()
 
-for filename in os.listdir(pdf_dir):
-    if filename.endswith(".pdf"):
-        file = os.path.join(pdf_dir, filename)
-        print(file)
-        rename(file)
+    pdf_dir = args.pdf_dir
+
+    for filename in os.listdir(pdf_dir):
+        if filename.endswith(".pdf"):
+            file = os.path.join(pdf_dir, filename)
+            print(file)
+            rename(file)
