@@ -1,2 +1,2 @@
-docker build -t my-container .
-docker run -v /path/to/pdf/files:/app/pdf-files my-container
+docker build -t some-image-name .
+docker run -e PDF_DIR=/home/root-fame/Documents -v /home/root-fame/Documents:/app/Documents some-image-name
