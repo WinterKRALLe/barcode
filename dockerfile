@@ -12,6 +12,10 @@ RUN apt-get update \
 ENV LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu/
 
 RUN apt-get update \
+    && apt-get install -y poppler-utils \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN apt-get update \
     && apt-get install -y libgl1-mesa-glx libzbar-dev \
     && rm -rf /var/lib/apt/lists/*
 
