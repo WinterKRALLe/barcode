@@ -1,0 +1,29 @@
+# Use Windows as the base image
+FROM mcr.microsoft.com/windows/servercore:ltsc2019
+
+# Set the working directory
+WORKDIR C:\app
+
+# Install Python 3.8
+RUN powershell -Command \
+    $ErrorActionPreference = 'Stop'; \
+    $ProgressPreference = 'SilentlyContinue'; \
+    Invoke-WebRequest -Uri https://www.python.org/ftp/python/3.8.12/python-3.8.12-amd64.exe -OutFile python.exe; \
+    Start-Process .\python.exe -ArgumentList '/quiet InstallAllUsers=1 PrependPath=1' -Wait; \
+    Remove-Item python.exe
+
+# Set the environment variables
+ENV PATH="C:\Program Files\Python38;C:\Program Files\Python38\Scripts;${PATH}" \
+    PDF_DIR=C:\pdf_files
+
+# Install the necessary dependencies
+RUN pip install opencv-python-headless \
+                pyzbar \
+                pdf2image \
+                PyPDF3
+
+# Copy the code to the container
+COPY app.py .
+
+# Run the code
+CMD ["python", "script.py"]
