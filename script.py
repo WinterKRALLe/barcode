@@ -17,7 +17,7 @@ def Extract_Code_From_PDF(input_file, output_file, code_type):
     #bar code
     if 'bar' in code_type.lower():
         output_page.cropBox.lowerLeft = (0, 0)
-        output_page.cropBox.upperleft = (0, 100)
+        output_page.cropBox.upperLeft = (0, 100)
         output_page.cropBox.lowerRight = (286, 0)
         output_page.cropBox.upperRight = (286, 100)
 
@@ -61,16 +61,25 @@ def rename(input_file):
 
 
     barcodes = decode(gray_image)
+    
+    if not barcodes:
+        print(f"No barcodes found in {input_file}")
+        return
 
 
-    for barcode in barcodes:
-        (x, y, w, h) = barcode.rect
-        bar = barcode.data.decode("utf-8")
-        print("Barcode data:", barcode.data.decode("utf-8"))
-        print("Barcode type:", barcode.type)
 
-    new_file_path = os.path.join(os.path.expanduser(new_dir), bar + ".pdf")
-    os.rename(input_file, new_file_path)
+    print("Barcode data:", barcodes[0].data.decode("utf-8"))
+    print("Barcode type:", barcodes[0].type)
+
+    
+    bar = barcodes[0].data.decode("utf-8")
+    new_file_path = os.path.join(os.path.expanduser(new_dir), f"{bar}.pdf")
+    
+    try:
+        os.rename(input_file, new_file_path)
+    except Exception as e:
+        print(f"Error renaming file {input_file}: {e}")
+        return
 
     os.remove(image_path)
     os.remove(output_file)
