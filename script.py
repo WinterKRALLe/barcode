@@ -1,5 +1,6 @@
 import cv2
 import os
+import shutil
 from pyzbar.pyzbar import decode
 from pdf2image import convert_from_path
 from PyPDF3 import PdfFileWriter, PdfFileReader
@@ -75,11 +76,20 @@ def rename(input_file):
 
     
     bar = barcodes[0].data.decode("utf-8")
-    new_bar = bar.replace("/", "\\")
+    new_bar = bar.replace("/", "_")
     new_file_path = os.path.join(os.path.expanduser(new_dir), f"{new_bar}.pdf")
     
+    if os.path.exists(new_file_path):
+        i = 1
+        while True:
+            new_file_path = os.path.join(os.path.expanduser(new_dir), f"{new_bar}_{i}.pdf")
+            if not os.path.exists(new_file_path):
+                break
+            i += 1
+
     try:
-        os.rename(input_file, new_file_path)
+        shutil.copy2(input_file, new_file_path)
+        os.remove(input_file)
     except Exception as e:
         print(f"Error renaming file {input_file}: {e}")
         return
