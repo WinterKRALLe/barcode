@@ -16,11 +16,15 @@ def Extract_Code_From_PDF(input_file, output_file, code_type):
 
     #bar code
     if 'bar' in code_type.lower():
-        output_page.cropBox.lowerLeft = (0, 0)
-        output_page.cropBox.upperLeft = (0, 100)
-        output_page.cropBox.lowerRight = (286, 0)
-        output_page.cropBox.upperRight = (286, 100)
+        x0 = 14.75 * 28.35  # Convert cm to points (1 cm = 28.35 points)
+        y0 = (output_page.mediaBox.getHeight() - 26 * 28.35)
+        x1 = 20.9 * 28.35
+        y1 = (output_page.mediaBox.getHeight() - 28.66 * 28.35)
 
+        output_page.mediaBox.lowerLeft = (x0, y0)
+        output_page.mediaBox.lowerRight = (x1, y0)
+        output_page.mediaBox.upperLeft = (x0, y1)
+        output_page.mediaBox.upperRight = (x1, y1)
 
     #Data Matrix code
     # if 'matrix' in code_type.lower():
@@ -46,7 +50,7 @@ def rename(input_file):
     Extract_Code_From_PDF(input_file, output_file, code_type)
 
 
-    pages = convert_from_path(output_file, dpi=300, first_page=0, last_page=0)
+    pages = convert_from_path(input_file, first_page=0, last_page=0)
     image = pages[0]
 
 
@@ -54,26 +58,25 @@ def rename(input_file):
 
     image.save(image_path)
 
-    image = cv2.imread(image_path)
+    image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
 
+    new = cv2.convertScaleAbs(image, alpha=1.2, beta=50)
 
-    gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    barcodes = decode(new)
 
-
-    barcodes = decode(gray_image)
-    
     if not barcodes:
         print(f"No barcodes found in {input_file}")
+        os.remove(image_path)
+        os.remove(output_file)
         return
-
-
 
     print("Barcode data:", barcodes[0].data.decode("utf-8"))
     print("Barcode type:", barcodes[0].type)
 
     
     bar = barcodes[0].data.decode("utf-8")
-    new_file_path = os.path.join(os.path.expanduser(new_dir), f"{bar}.pdf")
+    new_bar = bar.replace("/", "\\")
+    new_file_path = os.path.join(os.path.expanduser(new_dir), f"{new_bar}.pdf")
     
     try:
         os.rename(input_file, new_file_path)
@@ -83,9 +86,6 @@ def rename(input_file):
 
     os.remove(image_path)
     os.remove(output_file)
-    
-
-
 
 
 for filename in os.listdir(pdf_dir):
